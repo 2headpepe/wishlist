@@ -1,0 +1,25 @@
+name: CLIENT-3432-CICD
+
+on:
+    push:
+        branches:
+            - main
+
+jobs:
+    build-and-deploy:
+        runs-on: client-3432
+
+        steps:
+            - name: Checkout Repository
+              uses: actions/checkout@v4
+              with:
+                  ref: master
+            - name: Deploy app
+              run: |
+                  docker compose down || true
+                  docker compose up -d --build
+
+            - name: Clean up
+              run: |
+                  docker image prune -f
+                  find . -mindepth 1 -not -path "./.git*" -exec rm -rf {} +
